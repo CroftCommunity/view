@@ -80,8 +80,9 @@ and only takes over on the user's click.
 ### Test layout (adopted verbatim)
 
 - **Unit (vitest, node):** pure logic only — SW routing, theme resolution,
-  brand-token ratios, no-hex guard, plus View's catalog validation, the C1
-  no-YouTube scan, license templates, the mediaBase switch, kiosk parsing.
+  brand-token ratios, no-hex guard, plus View's catalog validation, the
+  Live-embed law (`embeds.test.ts`), license templates, the mediaBase switch,
+  kiosk parsing.
 - **Hermetic e2e (playwright):** against the built bundle over the zero-dep static
   server; service workers blocked by default (the `pwa.spec` re-enables them).
   Smoke, CSP (zero violations, no cross-origin script), mobile-fit, a11y (axe,
@@ -150,9 +151,12 @@ every module script; the one inline (pre-paint theme) script admitted by its
 sha256, never `unsafe-inline`. `tests/e2e/csp.spec.ts` asserts zero violations and
 no cross-origin script. View's one widening: `media-src`/`img-src` (and
 `frame-src` only if an embed scene exists) are **derived from `scenes.json` +
-`mediaBase`** at build time — so a remote media origin (R2 later) gets exactly the
-origins it needs and nothing more; today, with local relative media, they stay
-`'self' data: blob:`. See `docs/SECURITY.md`.
+`mediaBase`** at build time — so each origin the catalog actually references gets
+in and nothing more. Today Parks streams the NPS clips in place, so the build
+adds `https://www.nps.gov` to `media-src`; Live cams embed the explore.org player
+(served on YouTube), so `https://www.youtube.com` joins `frame-src` (the old
+no-YouTube constraint C1 is superseded); our own relative media resolves under
+`mediaBase`. See `docs/SECURITY.md`.
 
 ## Working method (adopted verbatim)
 
@@ -162,13 +166,14 @@ at the repo root carrying red→green evidence, the full gate output, a
 verify-in-run ledger for anything a hermetic test can't reach, and a files-touched
 ledger. Mirrored here as `RUN-P1..P5`.
 
-## Deploy (mapped: R2 in the plan → GitHub Pages is live)
+## Deploy (app on GitHub Pages; third-party video streamed in place)
 
-The build plan wrote R2 as the deploy target. The owner has since wired
-`view.croft.ing` to **GitHub Pages** (custom domain, DNS verified, HTTPS
-enforced). So: the **app** ships to Pages (a `CNAME` file is emitted into `dist/`;
-CI builds and deploys via GitHub Actions — Pages Source must be **GitHub
-Actions**, not a branch, so the built output is served, not the raw templates).
-**Video still comes via `mediaBase`** (R2), because Pages is not for large media
-and the chassis already keeps `mediaBase` as the only deploy switch. See
-`docs/DEPLOY.md`.
+The **app** ships to **GitHub Pages** at `view.croft.ing` (custom domain, DNS
+verified, HTTPS enforced; a `CNAME` file is emitted into `dist/`; CI builds and
+deploys via GitHub Actions — Pages Source must be **GitHub Actions**, not a
+branch, so the built output is served, not the raw templates).
+
+View is a **discovery portal, not a mirror**: Live (explore.org) and Parks (NPS)
+**stream in place** from the source origin, so that media never touches Pages or
+R2. `mediaBase` is the deploy switch for the one shelf that is *our own* content
+(Mine) — `""` locally, an R2/CDN origin later. See `docs/DEPLOY.md`.

@@ -5,18 +5,24 @@ files serves it. Two facts shape the deploy:
 
 1. **The app is on GitHub Pages** at `view.croft.ing` (custom domain, DNS
    verified, HTTPS enforced — already configured in repo settings).
-2. **Video is NOT on Pages.** Large media comes via `mediaBase` (an R2 origin),
-   because Pages is not for serving video and the chassis keeps `mediaBase` as the
-   only deploy-time switch.
+2. **View streams third-party video in place; it does not mirror it.** View is a
+   discovery portal: Live (explore.org) and Parks (NPS) point directly at the
+   source origin, so that media never touches Pages, git, or R2. The one
+   exception is *our own* content (the Mine shelf), which we self-host via
+   `mediaBase` — the only deploy-time switch (`""` locally, an R2/CDN origin
+   later). Large third-party media staying off Pages is a consequence of the
+   portal model, not a hosting workaround.
 
-## Runs now (no R2, no media)
+## Runs now
 
 ```
 npm run build && npm run serve   # → http://localhost:4173
 ```
 
-The site renders fully; Parks/Mine windows show a poster + "Open this view" until
-their media exists, and Live cams link out to explore.org.
+The site renders fully. Live cams link out to explore.org; **Parks streams the
+NPS public-domain clips in place** (tap "Open this view", then use the fullscreen
+control to fill the screen from view.croft.ing); Mine windows show a poster +
+"Open this view" until you drop a clip under `media/mine/`.
 
 ## GitHub Pages (the app)
 
@@ -29,30 +35,60 @@ contains `CNAME` (`view.croft.ing`) and `.nojekyll`.
 > the raw source templates — which still contain the build-time `%CSP%` / SRI
 > placeholders — and render broken. The Actions deploy serves the built output.
 
-## R2 (the media) — owner, ~30 min, one-time
+## Our own media (the Mine shelf) — R2, later, optional
+
+Only the Mine shelf is content *we* host; Live and Parks stream from their source
+and need no infrastructure. When there is real Mine content:
 
 1. **Cloudflare**: `croft.ing` DNS on Cloudflare (prerequisite for R2 custom
-   domains). Create an R2 bucket for View's media; bind a custom domain (e.g.
-   `media.view.croft.ing`). Do not use the `r2.dev` URL in production (rate-limited,
-   dev-only). Serving video from R2 through Cloudflare is the explicitly permitted
-   configuration; do not front third-party storage with the CDN for video.
-2. **Upload** the media originals: `media/parks/*.mp4`, `media/mine/test.mp4`, and
-   any `posters/*.jpg`. Optionally re-encode (H.264 high profile 1080p ~6 Mbps,
-   faststart, clean loop trim) so playback never depends on a third party.
-3. **Flip the switch**: set `"mediaBase"` in `scenes.json` to the R2 origin (e.g.
-   `https://media.view.croft.ing`) and rebuild. That is the ONLY change — every
-   relative `src` resolves under it (proven by `tests/unit/mediabase.test.ts`), and
-   the build re-derives the CSP `media-src`/`img-src` to include that origin.
+   domains). Create an R2 bucket for View's own media; bind a custom domain (e.g.
+   `media.view.croft.ing`). Do not use the `r2.dev` URL in production
+   (rate-limited, dev-only).
+2. **Upload** the Mine originals to `media/mine/` (and any `posters/*.jpg`).
+   Optionally re-encode (H.264 high profile 1080p ~6 Mbps, faststart, clean loop
+   trim).
+3. **Flip the switch**: set `"mediaBase"` in `scenes.json` to the R2 origin and
+   rebuild. That is the ONLY change — every *relative* `src` (i.e. our own
+   content) resolves under it (proven by `tests/unit/mediabase.test.ts`), and the
+   build re-derives the CSP `media-src`/`img-src`. Third-party absolute `src`
+   values are untouched.
 4. **Wall device**: point the kiosk browser at
    `https://view.croft.ing/?kiosk=shuffle:parks` (or `?kiosk=<sceneId>`).
 
-## Parks media — what to mirror
+## Live cams — refreshing the YouTube embed ids
 
-NPS no longer exposes direct `.mp4` URLs (only first-party embed players), so the
-Parks `src` values are the intended mirrored paths under `media/parks/`. The five
-Grand Canyon B-Roll clips chosen (all public domain, South Rim Winter set,
-`b-roll_hd16.htm`) and their NPS media embed IDs are recorded in
-`RUN-P4-SUMMARY.md` so the owner can mirror the exact assets.
+explore.org serves its cams only through YouTube, so each Live scene embeds a
+YouTube video id. A live broadcast's id changes when the stream restarts — rare
+for perpetual cams (the aurora cam has held one id since 2023), ~yearly for
+seasonal ones (Brooks Falls). When a Live cam shows "video unavailable," refresh
+the ids:
+
+```
+npm run refresh:live         # re-derive current ids from explore.org, rewrite scenes.json
+npm run refresh:live:check   # report drift only, non-zero exit if stale (no write)
+```
+
+The tool (`tools/refresh-live-ids.mjs`) is fetch-only (no browser): it reads each
+scene's `creditUrl` (the explore cam page), extracts the current embed id, and
+does a minimal-diff rewrite. It fails loud — if any cam can't be resolved, it
+writes nothing and exits non-zero.
+
+In CI this is a **manual-only** workflow (`.github/workflows/refresh-live-ids.yml`,
+`workflow_dispatch`) — it never runs on push/deploy (the deploy stays hermetic).
+Trigger it from the Actions tab; if any id drifted it opens a PR with the update
+to review and merge.
+
+## Parks — streamed from NPS, not mirrored
+
+NPS publishes these Grand Canyon B-Roll clips (public domain, South Rim Winter
+set, `b-roll_hd16.htm`) and each plays through a first-party embed player that
+serves a direct `.mp4`. View points each Parks scene straight at that `.mp4`
+(`kind:"video"`, absolute `src`) and streams it in place — the build adds
+`www.nps.gov` to `media-src` automatically. There is nothing to mirror. If a clip
+URL ever changes, re-derive it by opening the NPS embed player
+(`nps.gov/media/video/embed.htm?id=<id>` — the ids are recorded in
+`RUN-P4-SUMMARY.md`) and reading its `<video>` source, then update the scene's
+`src`.
 
 ## Optional wink
 

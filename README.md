@@ -21,21 +21,31 @@ npm run build && npm run serve   # → http://localhost:4173
 
 - **`scenes.json`** (repo root) is the only place content lives. Each scene names
   its shelf, kind (`video` · `embed` · `link`), source, and **licence** (shown
-  on-page, per scene). `mediaBase` is the single deploy-time switch: `""` locally,
-  an R2 origin later — nothing else changes.
-- **Three shelves:** **Live** (explore.org cams, as link cards), **Parks** (NPS
-  Grand Canyon B-Roll, US public domain), **Mine** (your own clips, CC BY 4.0).
+  on-page, per scene). View is a **discovery portal, not a mirror**: third-party
+  scenes (Live · Parks) **stream in place** from the source origin (an absolute
+  `src`). Our own clips (Mine) use a relative `src` that `mediaBase` — the single
+  deploy-time switch, `""` locally and an R2/CDN origin later — resolves.
+- **Three shelves:** **Live** (explore.org cams, embedded in place through the
+  source's own player — served on YouTube), **Parks** (NPS Grand Canyon B-Roll,
+  US public domain — the direct public-domain `.mp4` streamed in place), **Mine**
+  (your own clips, CC BY 4.0). Video/embed scenes play inline (tap to start) with
+  a fullscreen control, so you never leave view.croft.ing.
 - **The window** is the one deliberate flourish — scenes read as *through* glass.
   Two themes: morning air (light) / comforting storm (dark).
 - **Kiosk mode** for a wall display:
   `view.croft.ing/?kiosk=shuffle:parks` (rotate a shelf) or
   `?kiosk=<sceneId>` (one scene), full-viewport, autoplay, loop.
 
-### No ads, ever (constraint C1)
+### Ads and embeds (constraint C1, superseded)
 
-Because YouTube's terms let it monetise embedded content, **no YouTube iframe can
-enter the bundle** — enforced by a runtime validator, a unit test that scans
-`scenes.json`, and a hard build-time assertion.
+View adds no ads, no accounts, and no tracking of its own. The original
+constraint C1 went further — **no YouTube iframe, ever** — to guarantee no ads at
+all. That is now **superseded**: View is a discovery portal, and explore.org
+serves its cams only through YouTube, so the Live shelf embeds the source's
+YouTube player in place. An embedded source player may carry that source's ads;
+the tradeoff was chosen deliberately (embed over a bare external link) and will
+be revisited if it becomes a problem. The CSP still admits only the exact embed
+origins the catalog references.
 
 ## Add your own view (the Mine shelf)
 
@@ -46,8 +56,10 @@ see the Mine shelf locally, drop a clip at:
 media/mine/test.mp4
 ```
 
-Then `npm run build && npm run serve` and open the **Mine** shelf. For real
-deployment, media is served from R2 via `mediaBase` — see
+Then `npm run build && npm run serve` and open the **Mine** shelf. Mine is the
+one shelf that is *our own* content, so it is the only media View self-hosts: for
+real deployment it is served via `mediaBase` (an R2/CDN origin). Live and Parks
+never enter git or R2 — they stream from their source. See
 [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
 ## Docs
@@ -55,7 +67,7 @@ deployment, media is served from R2 via `mediaBase` — see
 - [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md) — the Croft chassis, as View adopts it
 - [`docs/DESIGN.md`](docs/DESIGN.md) — brand: the two weathers + the window signature
 - [`docs/SECURITY.md`](docs/SECURITY.md) — CSP/SRI/SW posture
-- [`docs/DEPLOY.md`](docs/DEPLOY.md) — GitHub Pages (app) + R2 (media)
+- [`docs/DEPLOY.md`](docs/DEPLOY.md) — GitHub Pages (app); third-party streamed in place; our own media via `mediaBase`
 - `plans/` + `RUN-P1..P5-SUMMARY.md` — the phased build record
 
 ## Licence

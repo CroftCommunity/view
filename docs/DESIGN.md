@@ -72,7 +72,7 @@ stage, so the signature stays singular.
 ## Copy voice (plain, warm, short)
 
 Wordmark **View**; hero line "Put a window where there isn't one." Buttons say
-what they do ("Open this view", "Watch live at explore.org →"). Empty shelf:
+what they do ("Open this view", "Fullscreen"). Empty shelf:
 "Nothing here yet — the first view is coming." Offline: "No view without a sky
 — you're offline."
 

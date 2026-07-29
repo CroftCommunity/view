@@ -1,5 +1,16 @@
 # RUN P4 — shelves (Live · Parks · Mine) + kiosk
 
+> **Superseded — historical record.** This document reflects the original build,
+> which planned two decisions later revised. View is now a **discovery portal**
+> that streams/embeds third-party media *in place*, not a mirror: (1) Parks
+> streams the NPS `.mp4` directly and Live embeds the explore.org player (served
+> on YouTube), so **`mediaBase`/R2 is only for our own future (Mine) content**;
+> and (2) **constraint C1 ("no YouTube embeds, ever") is reversed** — the embed
+> was chosen over an external link, accepting the source player's ad tradeoff.
+> The NPS embed ids recorded below are still useful — they are how the direct
+> `.mp4` URLs are re-derived. History below is kept intact; for current behaviour
+> see `README.md`, `docs/DEPLOY.md`, `docs/SECURITY.md`, and `docs/CONVENTIONS.md`.
+
 Scope: populate the three shelves under their per-shelf licensing rules, and build
 kiosk mode with its e2e.
 

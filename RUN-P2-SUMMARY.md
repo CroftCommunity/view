@@ -1,5 +1,13 @@
 # RUN P2 — the catalog (content system)
 
+> **Superseded — historical record.** The **C1** build gate / validator rule
+> described here ("no YouTube embeds, ever") is **reversed**: View is a discovery
+> portal and Live cams now embed the explore.org player (served on YouTube). The
+> validator accepts YouTube embeds; the build adds their origin to `frame-src`.
+> `mediaBase`/R2 is only for our own future (Mine) content — third-party Parks/Live
+> stream/embed in place. History below is kept intact; for current behaviour see
+> `README.md`, `docs/SECURITY.md`, and `docs/CONVENTIONS.md`.
+
 Scope: `scenes.json` as the only place content lives, a loader + validator, the
 stage renderer (video/embed/link), the per-scene credit chip (C2), shelf
 navigation, and the C1 no-YouTube scan.
