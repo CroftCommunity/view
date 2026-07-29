@@ -1,0 +1,105 @@
+/*
+ * View — brand tokens. "A window from another point of view."
+ *
+ * THIS IS THE ONLY FILE ALLOWED TO CONTAIN RAW HEX. Components (styles.css) and
+ * app code reference these semantic custom properties via var(), never a literal
+ * colour — enforced by tests/unit/brand-nohex.test.ts. New colours are added
+ * HERE with a recorded WCAG contrast ratio, asserted by
+ * tests/unit/brand-tokens.test.ts — the numbers are load-bearing, not decoration.
+ * (Croft brand-token discipline, per croft-pwa docs/DESIGN.md.)
+ *
+ * View expresses two weathers through the shared Croft semantic token roles.
+ * The poetic palette names from the brand plan map onto the roles as noted; the
+ * mapping is also logged in docs/CONVENTIONS.md.
+ *
+ *   LIGHT "morning air"           DARK "comforting storm"
+ *   --sky   #F6F9FB → --bg        --storm #12181F → --bg
+ *   --haze  #E3ECF2 → --surface   --cloud #1D2733 → --surface
+ *   --water #9FBAC9 → --border    --rain  #55677A → --border
+ *   --pine  #2E4B47 → --ink       --mist  #C9D4DC → --ink
+ *   --dawn  #C97B3D → --accent    --lamp  #E8B36B → --accent
+ *
+ * The two accents are siblings — dawn light / lamp light — so the brand holds
+ * across modes. Ratios below are the ACTUAL computed values.
+ *
+ * Type: Fraunces (display) + Inter (body/UI), self-hostable; system fallbacks.
+ */
+
+:root {
+  /* --- Light theme (default): "morning air" — pale, airy, early daylight --- */
+  --bg: #f6f9fb;          /* --sky: page background — pale morning white-blue */
+  --surface: #e3ecf2;     /* --haze: cards, raised surfaces */
+  --ink: #2e4b47;         /* --pine: primary/body text        (bg 8.97:1) */
+  --ink-muted: #4e6b72;   /* slate — captions, mono machine facts (bg 5.41:1) */
+  --accent: #c97b3d;      /* --dawn: primary action fill (first-light amber) */
+  --accent-ink: #131f1b;  /* deep pine ink on --accent        (5.15:1) */
+  --active: #2e5d53;      /* deep teal-pine — active/current fill */
+  --active-ink: #f6f9fb;  /* sky ink on --active              (7.08:1) */
+  --link: #8f511f;        /* darkened dawn amber — body-text links (bg 5.90:1, on surface 5.22:1) */
+  --danger: #a23520;      /* terracotta rust — warning/destructive (not a 2nd accent) */
+  --danger-ink: #f6f9fb;  /* sky ink on --danger              (6.48:1) */
+  --border: #9fbac9;      /* --water: hairline dividers, quiet UI — decorative */
+  --focus: #b4632c;       /* focus ring — dawn amber, deepened (bg 4.17:1) */
+  --code-bg: #e3ecf2;     /* --haze: inline/code block background */
+
+  /* --- Type roles --- */
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+
+  /* Type scale (fixed ramp — new sizes join the ramp, never ad-hoc) */
+  --t-stamp: 0.75rem;
+  --t-caption: 0.8125rem;
+  --t-body: 1rem;
+  --t-lead: 1.125rem;
+  --t-h3: 1.25rem;
+  --t-h2: 1.5rem;
+  --t-h1: 2rem;
+  --t-wordmark: 1.5rem;
+
+  /* Spacing (4px base) + radii + stroke */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --r-s: 4px;
+  --r-m: 8px;
+  --r-l: 14px;
+  --r-pill: 999px;
+  --stroke: 1.5px;
+
+  /* The window signature (Phase 3.4): a thin inset frame reading as glass. In
+   * light mode the frame is a cool water hairline; the warm cast arrives in dark. */
+  --window-frame: #cdd9e2;   /* frame edge — cool, quiet */
+  --window-sill: #b9c9d4;    /* the sill line at the bottom edge */
+
+  /* PWA manifest theme mirrors --bg; kept in sync by src/theme.ts */
+  --theme-color: #f6f9fb;
+}
+
+[data-theme='dark'] {
+  /* "storm, but comforting" — dark and weatherly, warm-inside-while-it-rains. */
+  --bg: #12181f;          /* --storm: deep blue-slate, not black */
+  --surface: #1d2733;     /* --cloud: surfaces */
+  --ink: #c9d4dc;         /* --mist: primary/body text        (bg 11.85:1) */
+  --ink-muted: #8b9cab;   /* muted mist — captions, mono facts (bg 6.33:1) */
+  --accent: #e8b36b;      /* --lamp: lamplight amber — the comfort */
+  --accent-ink: #12181f;  /* storm ink on --accent            (9.43:1) */
+  --active: #6fb08c;      /* lamplit sea-green — active/current fill */
+  --active-ink: #12181f;  /* storm ink on --active            (7.03:1) */
+  --link: #e8b36b;        /* --lamp: lamplight amber links    (bg 9.43:1) */
+  --danger: #e4795b;      /* rust, lightened for dark */
+  --danger-ink: #12181f;  /* storm ink on --danger            (6.11:1) */
+  --border: #55677a;      /* --rain: hairline dividers, quiet UI — decorative */
+  --focus: #e8b36b;       /* focus ring — lamp amber          (bg 9.43:1) */
+  --code-bg: #1d2733;     /* --cloud */
+
+  /* The window warms slightly toward --lamp in the dark (Phase 3.4). */
+  --window-frame: #3a4655;   /* frame edge — warm rainy slate */
+  --window-sill: #4a3c2e;    /* sill line — a hint of lamplight below the glass */
+
+  --theme-color: #12181f;
+}

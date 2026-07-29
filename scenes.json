@@ -1,0 +1,117 @@
+{
+  "mediaBase": "",
+  "scenes": [
+    {
+      "id": "explore-african-watering-hole",
+      "shelf": "live",
+      "title": "African watering hole",
+      "kind": "link",
+      "src": "https://explore.org/livecams/african-wildlife/african-watering-hole-animal-camera",
+      "license": "explore-fan",
+      "credit": "African watering hole · Mpala, Kenya",
+      "creditUrl": "https://explore.org/livecams/african-wildlife/african-watering-hole-animal-camera"
+    },
+    {
+      "id": "explore-african-river",
+      "shelf": "live",
+      "title": "African river",
+      "kind": "link",
+      "src": "https://explore.org/livecams/african-wildlife/african-river-wildlife-camera",
+      "license": "explore-fan",
+      "credit": "African river · Mpala, Kenya",
+      "creditUrl": "https://explore.org/livecams/african-wildlife/african-river-wildlife-camera"
+    },
+    {
+      "id": "explore-northern-lights",
+      "shelf": "live",
+      "title": "Northern lights",
+      "kind": "link",
+      "src": "https://explore.org/livecams/aurora-borealis-northern-lights/northern-lights-cam",
+      "license": "explore-fan",
+      "credit": "Aurora borealis · Churchill, Canada",
+      "creditUrl": "https://explore.org/livecams/aurora-borealis-northern-lights/northern-lights-cam"
+    },
+    {
+      "id": "explore-brooks-falls",
+      "shelf": "live",
+      "title": "Brooks Falls",
+      "kind": "link",
+      "src": "https://explore.org/livecams/brown-bears/brown-bear-salmon-cam-brooks-falls",
+      "license": "explore-fan",
+      "credit": "Brooks Falls · Katmai, Alaska",
+      "creditUrl": "https://explore.org/livecams/brown-bears/brown-bear-salmon-cam-brooks-falls"
+    },
+    {
+      "id": "grca-bright-angel-winter-sunset",
+      "shelf": "parks",
+      "title": "Bright Angel winter sunset",
+      "kind": "video",
+      "src": "media/parks/grca-bright-angel-winter-sunset.mp4",
+      "poster": "posters/grca-bright-angel-winter-sunset.jpg",
+      "license": "public-domain",
+      "credit": "National Park Service — public domain",
+      "creditUrl": "https://www.nps.gov/grca/learn/photosmultimedia/b-roll_hd16.htm",
+      "loop": true
+    },
+    {
+      "id": "grca-yaki-point-winter-sunrise",
+      "shelf": "parks",
+      "title": "Yaki Point winter sunrise",
+      "kind": "video",
+      "src": "media/parks/grca-yaki-point-winter-sunrise.mp4",
+      "poster": "posters/grca-yaki-point-winter-sunrise.jpg",
+      "license": "public-domain",
+      "credit": "National Park Service — public domain",
+      "creditUrl": "https://www.nps.gov/grca/learn/photosmultimedia/b-roll_hd16.htm",
+      "loop": true
+    },
+    {
+      "id": "grca-oneill-butte-sunrise",
+      "shelf": "parks",
+      "title": "Sunrise over O’Neill Butte",
+      "kind": "video",
+      "src": "media/parks/grca-oneill-butte-sunrise.mp4",
+      "poster": "posters/grca-oneill-butte-sunrise.jpg",
+      "license": "public-domain",
+      "credit": "National Park Service — public domain",
+      "creditUrl": "https://www.nps.gov/grca/learn/photosmultimedia/b-roll_hd16.htm",
+      "loop": true
+    },
+    {
+      "id": "grca-north-rim-still",
+      "shelf": "parks",
+      "title": "North Rim, still",
+      "kind": "video",
+      "src": "media/parks/grca-north-rim-still.mp4",
+      "poster": "posters/grca-north-rim-still.jpg",
+      "license": "public-domain",
+      "credit": "National Park Service — public domain",
+      "creditUrl": "https://www.nps.gov/grca/learn/photosmultimedia/b-roll_hd16.htm",
+      "loop": true
+    },
+    {
+      "id": "grca-north-rim-sunrise-pan",
+      "shelf": "parks",
+      "title": "North Rim sunrise pan",
+      "kind": "video",
+      "src": "media/parks/grca-north-rim-sunrise-pan.mp4",
+      "poster": "posters/grca-north-rim-sunrise-pan.jpg",
+      "license": "public-domain",
+      "credit": "National Park Service — public domain",
+      "creditUrl": "https://www.nps.gov/grca/learn/photosmultimedia/b-roll_hd16.htm",
+      "loop": true
+    },
+    {
+      "id": "mine-test",
+      "shelf": "mine",
+      "title": "My test view",
+      "kind": "video",
+      "src": "media/mine/test.mp4",
+      "poster": "posters/mine-test.jpg",
+      "license": "cc-by",
+      "credit": "© croft — CC BY 4.0",
+      "creditUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "loop": true
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # The one gate, identical to `npm run test` locally:
+      # lint · typecheck · unit · build · e2e.
+      - run: npm test
+
+  # Deploy the built dist/ to GitHub Pages, which serves view.croft.ing (custom
+  # domain + HTTPS configured in repo settings; the CNAME file ships in dist/).
+  # NOTE: this requires Settings → Pages → Source = "GitHub Actions" (not
+  # "Deploy from a branch"), so the BUILT output is served, not the raw source
+  # templates. Video is NOT served from Pages — it comes via `mediaBase` (R2).
+  deploy:
+    needs: gate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deploy
+        uses: actions/deploy-pages@v4
