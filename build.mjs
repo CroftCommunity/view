@@ -3,11 +3,11 @@
 // worker, and emit a self-contained static dist/ (Croft chassis pattern — no
 // framework, no router). One command, mirrored by CI.
 //
-// View-specific: scenes.json is copied verbatim and validated at build time —
-// constraint C1 (no YouTube embeds, ever) is a hard build failure here, matching
-// the unit test and the runtime validator. The CSP's media/img/frame origins are
-// DERIVED from scenes.json + mediaBase, so a deploy that points mediaBase at an
-// R2 origin gets exactly the origins it needs and nothing more.
+// View-specific: scenes.json is copied verbatim and validated at build time. The
+// CSP's media/img/frame origins are DERIVED from scenes.json + mediaBase, so each
+// origin the catalog references (an NPS stream, a YouTube embed, an R2 mediaBase)
+// gets in and nothing more. (The old constraint C1 — no YouTube embeds, ever — is
+// reversed under the portal model; see docs, marked superseded.)
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync, rmSync, mkdirSync, cpSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -58,11 +58,10 @@ const PAGES = [
   { html: 'offline.html', entry: 'src/pages/offline.ts', jsToken: '%OFFLINE_JS%', sriToken: '%OFFLINE_JS_SRI%' },
 ];
 
-// --- Constraint C1 + CSP origins, from scenes.json ---------------------------
+// --- CSP origins, from scenes.json -------------------------------------------
 // A tiny, dependency-free mirror of src/catalog.ts's host logic (build.mjs is
 // plain JS and cannot import the TS module). The authoritative version is tested
 // in tests/unit; this is the build gate.
-const YT = ['youtube.com', 'youtube-nocookie.com', 'youtu.be'];
 function isAbsolute(src) {
   return /^(https?:)?\/\//i.test(src);
 }
@@ -73,13 +72,6 @@ function originOf(src) {
   } catch {
     return null;
   }
-}
-function hostOf(src) {
-  const o = originOf(src);
-  return o ? new URL(o).hostname.toLowerCase() : '';
-}
-function isYouTube(host) {
-  return YT.some((b) => host === b || host.endsWith(`.${b}`));
 }
 
 const scenesRaw = readFileSync(join(root, 'scenes.json'), 'utf8');
@@ -95,11 +87,9 @@ if (baseOrigin) {
 }
 for (const s of scenes.scenes ?? []) {
   if (s.kind === 'embed') {
-    if (isYouTube(hostOf(s.src))) {
-      throw new Error(
-        `build: scene "${s.id}" is a YouTube embed (${hostOf(s.src)}) — forbidden by constraint C1 (no ads, ever).`,
-      );
-    }
+    // Portal model: embeds are allowed, including YouTube (explore.org's only
+    // player). The origin joins frame-src so the CSP permits exactly it. This
+    // reverses the old C1 build-time YouTube throw — see docs, marked superseded.
     const o = originOf(s.src);
     if (o) frameOrigins.add(o);
   }
@@ -261,5 +251,5 @@ if (cssGz > CSS_GZ_BUDGET) {
 }
 
 console.log(
-  `built ${version} -> dist/  (${PAGES.length} pages, sw + precache ${precache.length}, CSP+SRI on, C1 ok, budget ok)`,
+  `built ${version} -> dist/  (${PAGES.length} pages, sw + precache ${precache.length}, CSP+SRI on, budget ok)`,
 );

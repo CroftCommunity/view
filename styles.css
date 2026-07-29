@@ -233,6 +233,34 @@ main {
   position: relative;
   z-index: 2;
 }
+/* Fullscreen affordance — sits over playing media, bottom-right of the window. */
+.stage-fs {
+  position: absolute;
+  z-index: 3;
+  right: var(--s-3);
+  bottom: var(--s-3);
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: var(--stroke) solid var(--window-frame);
+  border-radius: var(--r-s);
+  background: var(--surface);
+  color: var(--ink);
+  opacity: 0.72;
+  cursor: pointer;
+  transition: opacity 160ms ease;
+}
+.stage-fs::before {
+  content: '\2922'; /* ⤢ diagonal expand */
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.stage-fs:hover,
+.stage-fs:focus-visible {
+  opacity: 1;
+}
 /* Crossfade layer for scene changes; reduced-motion collapses it (global rule). */
 .stage-media {
   opacity: 1;
@@ -240,6 +268,7 @@ main {
 }
 .stage-media.is-fading {
   opacity: 0;
+  pointer-events: none;
 }
 
 /* Credit chip — every scene renders its credit + link (constraint C2). */

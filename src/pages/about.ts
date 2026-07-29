@@ -50,10 +50,12 @@ function content(): HTMLElement {
       p.append(
         document.createTextNode(
           'View is a window from another point of view: ambient scenery for any ' +
-            'screen, kiosk-friendly for a wall display. It plays real footage from ' +
-            'a few carefully-licensed sources and shows the licence for every scene, ' +
-            'on the scene. No accounts, no ads, ever — and so no YouTube embeds, ' +
-            'because YouTube’s terms let it monetise anything embedded.',
+            'screen, kiosk-friendly for a wall display. It is a discovery portal — ' +
+            'it plays real footage from a few carefully-licensed sources in place, ' +
+            'and shows the licence for every scene, on the scene. View has no ' +
+            'accounts, adds no ads, and tracks nothing; a live cam is embedded ' +
+            'through the source’s own player (explore.org publishes on YouTube), ' +
+            'which may carry that source’s ads.',
         ),
       );
       return p;
@@ -81,8 +83,9 @@ function content(): HTMLElement {
         document.createTextNode('Footage © '),
         link('explore.org', 'https://explore.org'),
         document.createTextNode(
-          ', shown per their published guidelines: we deep-link to the specific cam ' +
-            'page rather than record it, and never wrap a cam in a YouTube player.',
+          ', shown per their published guidelines: we embed the cam’s own live ' +
+            'player in place and credit explore.org, rather than recording or ' +
+            're-hosting the footage.',
         ),
       );
     }),

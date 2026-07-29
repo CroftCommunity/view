@@ -29,10 +29,10 @@ test('theme toggle flips the document theme', async ({ page }) => {
 test('shelves switch, and each scene renders its licence credit (C2)', async ({ page }) => {
   await page.goto('/index.html');
 
-  // Default shelf is Live — a link card with the explore.org credit.
+  // Default shelf is Live — a tap-to-play embed with the explore.org credit.
   const credit = page.getByTestId('credit');
   await expect(credit).toContainText(/explore\.org/);
-  await expect(page.getByRole('link', { name: /Watch live at explore\.org/ }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Open this view' })).toBeVisible();
 
   // Switch to Parks: public-domain credit + a tap-to-play window (no eager load).
   await page.getByRole('button', { name: 'Parks' }).click();
