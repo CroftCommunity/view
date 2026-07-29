@@ -1,0 +1,19 @@
+{
+  "name": "View — a window from another point of view",
+  "short_name": "View",
+  "description": "Ambient scenery views for any screen — kiosk-friendly for a wall display. Ad-free, static, per-scene licensed.",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#f6f9fb",
+  "background_color": "#f6f9fb",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
