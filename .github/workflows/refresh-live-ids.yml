@@ -1,0 +1,42 @@
+name: refresh-live-ids
+
+# Manual only (workflow_dispatch): never runs on push/PR/deploy, so the deploy
+# pipeline stays hermetic. Re-derives each Live cam's current YouTube embed id
+# from explore.org and, if any drifted, opens a PR with the update. Run it when a
+# Live cam shows "video unavailable" (a stream restarted). Fetch-only — no
+# browser, no dependencies.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Re-derive Live cam ids and open a PR on drift
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node tools/refresh-live-ids.mjs
+          if [ -z "$(git status --porcelain scenes.json)" ]; then
+            echo "No drift — all Live cam ids are current." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          branch="chore/refresh-live-ids-${{ github.run_id }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add scenes.json
+          git commit -m "chore: refresh Live cam YouTube ids"
+          git push origin "$branch"
+          gh pr create \
+            --title "Refresh Live cam YouTube ids" \
+            --body "Automated refresh of explore.org Live cam YouTube embed ids via \`tools/refresh-live-ids.mjs\`. Review the id changes and merge to update the embeds." \
+            --base main --head "$branch"
