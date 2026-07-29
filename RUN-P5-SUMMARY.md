@@ -1,5 +1,12 @@
 # RUN P5 — legal furniture + PWA polish
 
+> **Superseded — historical record.** Where this document assumes Parks/Mine media
+> arrives via **R2/local under `mediaBase`**, that is now true only for our own
+> future (Mine) content. View is a discovery portal: Parks streams the NPS `.mp4`
+> directly and Live embeds the explore.org (YouTube) player in place. The old
+> constraint C1 ("no YouTube embeds, ever") is reversed. History below is kept
+> intact; for current behaviour see `README.md` and `docs/DEPLOY.md`.
+
 Scope: the About page (licensing legend, contact, AGPL note), the always-present
 footer licence line, the offline page, and PWA/a11y verification. Then the full
 gate + push.
