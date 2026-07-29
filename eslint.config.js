@@ -26,7 +26,7 @@ export default tseslint.config(
   },
   // Plain (non-type-checked) linting for tooling JS files.
   {
-    files: ['eslint.config.js', 'build.mjs', 'tools/**/*.mjs'],
+    files: ['eslint.config.js', 'build.mjs', 'tools/**/*.mjs', 'tests/**/*.mjs'],
     extends: [js.configs.recommended],
     languageOptions: {
       globals: { ...globals.node },
