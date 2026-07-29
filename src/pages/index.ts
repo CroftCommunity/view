@@ -91,7 +91,7 @@ function renderApp(app: HTMLElement, catalog: Catalog): void {
       const meta = el('div', 'scene-meta');
       meta.append(el('span', 'scene-title', scene.title));
       const sub = el('span', 'scene-sub');
-      sub.textContent = scene.kind === 'link' ? 'Watch live at explore.org →' : scene.credit;
+      sub.textContent = scene.kind === 'link' ? 'Open at the source →' : scene.credit;
       meta.append(sub);
       card.append(thumb, meta);
       card.addEventListener('click', () => showScene(scene, rail));

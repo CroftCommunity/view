@@ -6,10 +6,14 @@
 // under it. Absolute `src` values (e.g. the NPS public-domain URLs the Parks
 // shelf references directly in this build) are used as-is.
 //
-// Constraint C1 (no ads, ever → no YouTube iframes anywhere) is enforced here as
-// data: an `embed` scene whose host is a YouTube property is rejected. The same
-// rule is asserted as a unit test that scans the shipped scenes.json, and as a
-// build-time assertion in build.mjs — three layers, one law.
+// Portal model: View embeds the source's own player in place. explore.org serves
+// its live cams only through YouTube, so Live scenes are YouTube embeds. This
+// REVERSES the original constraint C1 ("no YouTube, ever" to guarantee no ads) —
+// the owner chose the embed over an external link, accepting the source player's
+// ad tradeoff (revisit if it becomes a problem). `isYouTubeHost`/`youTubeEmbeds`
+// remain as classifiers (used by tests and the CSP-origin derivation), but the
+// validator no longer rejects a YouTube embed. History: plans/ + RUN-P4, marked
+// superseded.
 
 export type Shelf = 'live' | 'parks' | 'mine';
 export type SceneKind = 'video' | 'embed' | 'link';
@@ -46,9 +50,10 @@ const SHELF_IDS = new Set<Shelf>(['live', 'parks', 'mine']);
 const KINDS = new Set<SceneKind>(['video', 'embed', 'link']);
 const LICENSES = new Set<LicenseKind>(['public-domain', 'cc-by', 'explore-fan']);
 
-// Constraint C1: YouTube's ToS lets it monetise embedded content, so no YouTube
-// property may ever be embedded. Host suffixes, matched case-insensitively.
-const FORBIDDEN_EMBED_HOSTS: readonly string[] = [
+// YouTube property host suffixes, matched case-insensitively. Once used to
+// forbid embeds (constraint C1); now a classifier so the build can add the right
+// frame-src origin for a YouTube embed and tests can assert Live uses it.
+const YOUTUBE_HOSTS: readonly string[] = [
   'youtube.com',
   'youtube-nocookie.com',
   'youtu.be',
@@ -70,10 +75,10 @@ export function hostOf(src: string): string {
   }
 }
 
-/** True if a host is a YouTube property (exact or subdomain). Constraint C1. */
+/** True if a host is a YouTube property (exact or subdomain). */
 export function isYouTubeHost(host: string): boolean {
   const h = host.toLowerCase();
-  return FORBIDDEN_EMBED_HOSTS.some((bad) => h === bad || h.endsWith(`.${bad}`));
+  return YOUTUBE_HOSTS.some((yt) => h === yt || h.endsWith(`.${yt}`));
 }
 
 /**
@@ -98,9 +103,9 @@ export function sceneById(catalog: Catalog, id: string): Scene | undefined {
 }
 
 /**
- * The C1 scan: every `embed` scene whose iframe host is a YouTube property.
- * Returns the offending scene ids ([] = clean). Used by the unit test against
- * the shipped scenes.json and by build.mjs as a hard build failure.
+ * Every `embed` scene whose iframe host is a YouTube property. Once the C1
+ * violation list; now an informational classifier (Live cams are expected to be
+ * on it). Retained for the CSP-origin derivation and tests.
  */
 export function youTubeEmbeds(catalog: Catalog): readonly string[] {
   return catalog.scenes
@@ -153,11 +158,6 @@ export function validateCatalog(data: unknown): { catalog: Catalog | null; probl
 
     for (const req of ['title', 'src', 'credit', 'creditUrl'] as const) {
       if (typeof s[req] !== 'string' || s[req].length === 0) problem(`missing \`${req}\``);
-    }
-
-    // Constraint C1, at validation time: an embed may never point at YouTube.
-    if (kind === 'embed' && typeof s['src'] === 'string' && isYouTubeHost(hostOf(s['src']))) {
-      problem('embed host is a YouTube property — forbidden by constraint C1 (no ads, ever)');
     }
 
     // Only accept a scene that has no problems attributed to it.

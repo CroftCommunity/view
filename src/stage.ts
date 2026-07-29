@@ -2,15 +2,17 @@
 // with a credit chip beside it (constraint C2) and a soft crossfade between
 // scenes (cut under prefers-reduced-motion). Three kinds:
 //
-//   video → native <video muted autoplay loop playsinline> with a poster.
-//           Ambient (kiosk) scenes attach + play immediately; browsing scenes
-//           wait for a tap ("Open this view") so a page never eagerly pulls a
-//           heavy remote clip on load.
-//   embed → sandboxed <iframe> filling the stage (first-party live players only;
-//           a YouTube host is rejected at validation — constraint C1). No embed
-//           scenes ship in this build (see RUN-P4), but the path is implemented.
-//   link  → a poster card with an external-arrow button that opens the source
-//           in a new tab (the explore.org / YouTube-wrapped fallback).
+//   video → native <video muted autoplay loop playsinline>, e.g. the NPS streams
+//           on the Parks shelf.
+//   embed → sandboxed <iframe> filling the stage, e.g. the explore.org live cams
+//           on the Live shelf (served through YouTube — the old no-YouTube
+//           constraint C1 is reversed under the portal model; see docs).
+//   link  → a poster card with an external-arrow button that opens the source in
+//           a new tab (kept for any source with no embeddable player).
+//
+// video and embed are heavy remote media: ambient (kiosk) scenes attach + play
+// immediately; browsing scenes wait for a tap ("Open this view") so a page never
+// eagerly pulls a stream on load. Both carry a fullscreen control.
 import type { Catalog, Scene } from './catalog';
 import { resolveMediaUrl } from './catalog';
 import { creditFor } from './license';
@@ -58,6 +60,11 @@ function buildVideo(scene: Scene, catalog: Catalog): HTMLVideoElement {
   video.setAttribute('preload', 'auto');
   if (scene.poster) video.poster = resolveMediaUrl(catalog.mediaBase, scene.poster);
   video.src = resolveMediaUrl(catalog.mediaBase, scene.src);
+  // Degrade gracefully: if the stream can't load — offline / 404 / decode error,
+  // or a third-party source that's down — fall back to the calm CSS poster
+  // instead of leaving an empty, broken <video> box (DEPLOY.md: a window shows a
+  // poster until its media exists).
+  video.addEventListener('error', () => video.replaceWith(posterPlaceholder()), { once: true });
   // Autoplay may be refused; swallow the rejection (progressive enhancement).
   void video.play?.().catch(() => {});
   return video;
@@ -76,6 +83,21 @@ function buildEmbed(scene: Scene): HTMLIFrameElement {
   return iframe;
 }
 
+function fullscreenButton(): HTMLButtonElement {
+  // Go fullscreen on the .stage (the glass frame), not the bare media, so the
+  // window aesthetic survives fullscreen. A portal viewer never has to leave
+  // view.croft.ing to fill the screen.
+  const btn = el('button', 'stage-fs');
+  btn.type = 'button';
+  btn.setAttribute('aria-label', 'Fullscreen');
+  btn.setAttribute('data-testid', 'stage-fullscreen');
+  btn.addEventListener('click', () => {
+    const target = btn.closest('.stage') ?? btn.parentElement;
+    void (target as HTMLElement | null)?.requestFullscreen?.().catch(() => {});
+  });
+  return btn;
+}
+
 function externalButton(label: string, href: string): HTMLAnchorElement {
   const a = el('a', 'btn btn-primary stage-play', label);
   a.href = href;
@@ -88,23 +110,25 @@ function externalButton(label: string, href: string): HTMLAnchorElement {
 function buildMedia(scene: Scene, catalog: Catalog, autoplay: boolean): HTMLElement {
   const layer = el('div', 'stage-media');
   if (scene.kind === 'link') {
-    layer.append(posterPlaceholder(), externalButton(`Watch live at explore.org →`, scene.src));
+    layer.append(posterPlaceholder(), externalButton(`Open at the source →`, scene.src));
     return layer;
   }
-  if (scene.kind === 'embed') {
-    layer.append(buildEmbed(scene));
-    return layer;
-  }
-  // video
+  // video | embed — both are heavy remote media (an NPS stream, a YouTube
+  // player). A fullscreen control rides with the media so a viewer can fill the
+  // screen without leaving view.croft.ing.
+  const attach = (): HTMLElement =>
+    scene.kind === 'embed' ? buildEmbed(scene) : buildVideo(scene, catalog);
+  // Ambient (kiosk) mode attaches and plays immediately; browsing mode waits for
+  // a tap so a page never eagerly pulls a stream — or loads a YouTube iframe —
+  // on load.
   if (autoplay) {
-    layer.append(buildVideo(scene, catalog));
+    layer.append(attach(), fullscreenButton());
     return layer;
   }
-  // Tap-to-play: poster placeholder + a play button that attaches the video.
   const poster = posterPlaceholder();
   const play = el('button', 'btn btn-primary stage-play', 'Open this view');
   play.addEventListener('click', () => {
-    layer.replaceChildren(buildVideo(scene, catalog));
+    layer.replaceChildren(attach(), fullscreenButton());
   });
   layer.append(poster, play);
   return layer;
@@ -140,6 +164,11 @@ export function createStage(catalog: Catalog, opts: StageOptions = {}): StageHan
     const prev = stageEl.querySelector('.stage-media');
     if (prev && !opts.reducedMotion) {
       next.classList.add('is-fading');
+      // Synchronously take the outgoing layer out of the accessibility tree and
+      // make it non-interactive, so its (now-stale) controls can't be found or
+      // clicked at any point during the crossfade — no sub-frame window.
+      prev.setAttribute('aria-hidden', 'true');
+      (prev as HTMLElement).style.pointerEvents = 'none';
       stageEl.append(next);
       // Fade the old out, the new in, then drop the old.
       requestAnimationFrame(() => {

@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolveMediaUrl, validateCatalog, isAbsoluteUrl, type Catalog } from '../../src/catalog';
 
-// The mediaBase law (build plan): mediaBase is the ONLY deploy-time switch, and
-// every RELATIVE scene src resolves under it. Absolute src (explore.org links)
-// is used as-is. R2 swap later = set mediaBase, nothing else.
+// The mediaBase law: mediaBase is the deploy-time switch for our OWN content, and
+// every RELATIVE scene src resolves under it. Absolute src — third-party streams
+// and embeds (NPS, YouTube) — is used as-is. R2 swap later = set mediaBase.
 describe('resolveMediaUrl — the deploy-time switch', () => {
   it('leaves an absolute src untouched regardless of mediaBase', () => {
     expect(resolveMediaUrl('', 'https://explore.org/x')).toBe('https://explore.org/x');
@@ -39,10 +39,22 @@ describe('shipped scenes.json obeys the mediaBase law', () => {
     }
   });
 
-  it('every Mine/Parks video src is relative (mirrorable to R2)', () => {
+  // View is a discovery portal that STREAMS third-party video in place — it is
+  // not a mirror. Live (explore.org) and Parks (NPS) point at the source origin
+  // directly; only our own future content (Mine) is a relative, self-hostable
+  // path that mediaBase later resolves.
+  it('our own (Mine) video src stays relative — the self-host target', () => {
     for (const s of c.scenes) {
-      if ((s.shelf === 'mine' || s.shelf === 'parks') && s.kind === 'video') {
+      if (s.shelf === 'mine' && s.kind === 'video') {
         expect(isAbsoluteUrl(s.src), `${s.id} should be relative`).toBe(false);
+      }
+    }
+  });
+
+  it('third-party shelves (Live/Parks) stream from an external origin (absolute)', () => {
+    for (const s of c.scenes) {
+      if (s.shelf === 'live' || s.shelf === 'parks') {
+        expect(isAbsoluteUrl(s.src), `${s.id} should be an absolute third-party URL`).toBe(true);
       }
     }
   });
