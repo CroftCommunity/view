@@ -110,7 +110,7 @@ pre code {
   padding: var(--s-1) var(--s-3);
   font: inherit;
   cursor: pointer;
-  min-height: 40px;
+  min-height: 44px;
 }
 
 main {
@@ -141,7 +141,7 @@ main {
   color: var(--ink-muted);
   text-decoration: none;
   white-space: nowrap;
-  min-height: 40px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
 }
@@ -299,7 +299,7 @@ main {
 .shelf-btn {
   font: inherit;
   cursor: pointer;
-  min-height: 40px;
+  min-height: 44px;
   padding: var(--s-1) var(--s-4);
   border-radius: var(--r-pill);
   border: var(--stroke) solid var(--border);

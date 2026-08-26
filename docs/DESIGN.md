@@ -79,7 +79,8 @@ what they do ("Open this view", "Fullscreen"). Empty shelf:
 ## Navigation law (Croft, verbatim)
 
 Pages, not modals. Mobile-first single column below 40rem; tabs move to a
-thumb-reachable bottom bar on phones. Touch targets ≥40px. Empty states are
+thumb-reachable bottom bar on phones. Touch targets ≥44px (WCAG 2.5.5 — the
+workspace floor, `CroftC/.claude/MOBILE-FIRST.md`). Empty states are
 invitations with a next step, never a blank box. Focus is visible everywhere (a
 3px `--focus` outline); `prefers-reduced-motion` collapses transitions (and the
 scene crossfade becomes a cut).
