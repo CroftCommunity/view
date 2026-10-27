@@ -1,7 +1,8 @@
 # View
 
 **A window from another point of view.** Ambient scenery views for any screen —
-kiosk-friendly for a wall display. Ad-free, static, per-scene licensed. Deployed
+kiosk-friendly for a wall display. Static and per-scene licensed; it adds no ads or
+tracking of its own (an embedded source player may carry the source's ads). Deployed
 to [view.croft.ing](https://view.croft.ing).
 
 View is a [Croft PWA](https://github.com/CroftCommunity/croft-pwa): a static,
